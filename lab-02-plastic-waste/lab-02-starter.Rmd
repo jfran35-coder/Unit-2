@@ -1,15 +1,19 @@
 ---
 title: "Lab 02 - Plastic waste"
-author: "Insert your name here"
-date: "Insert date here"
+author: "Jaymie Franco"
+date: "October 1st, 2025"
 output: github_document
 ---
 
 ## Load packages and data
 
-```{r load-packages, message=FALSE}
+```{r load-packages}
 library(tidyverse) 
 ```
+```{r}
+plastic_waste <- read_csv("data/plastic-waste.csv")
+```
+
 
 ```{r load-data, message=FALSE}
 plastic_waste <- read_csv("data/plastic-waste.csv")
@@ -18,63 +22,95 @@ plastic_waste <- read_csv("data/plastic-waste.csv")
 ## Exercises
 
 ### Exercise 1
-
-Remove this text, and add your answer for Exercise 1 here.
+The vast majority of the countrises were found to produce less than 1 kg/day per person, with North America and Europe containing higher averages of ~2kg/day per person.Trinidad and Tobango were the exception to this trend. 
 
 ```{r plastic-waste-continent}
-# insert code here
+ggplot(plastic_waste, aes(x = plastic_waste_per_cap)) +
+  geom_histogram(binwidth = 0.2)
+  facet_wrap(~ continent)
+```
+```{r}
+plastic_waste %>%
+  filter(plastic_waste_per_cap > 3.5)
 ```
 
-### Exercise 2
 
+### Exercise 2
+The distributions have reaffirmed that Asia and Africa have lower averages, while Europe and North America trend far higher.
 ```{r plastic-waste-density}
-# insert code here
+ggplot(plastic_waste, aes(x = plastic_waste_per_cap, 
+                     color = continent, 
+                     fill = continent)) +
+  geom_density(alpha = 0.2)
 ```
 
 ### Exercise 3
 
-Remove this text, and add your answer for Exercise 3 here.
+We defined the color and fill of the curves through mapping data-driven aesthetics of the plot. We defined the alpha level as a constant property of the geometry of the plotting geom.
+
+Again, navigate your lab-02.Rmd starter file and complete the second and third exercises. ### Exercise 4
+
+The violins display full density shape of the distribution. The box plots display the medians and quartiles and summary.
 
 ### Exercise 4
 
-Remove this text, and add your answer for Exercise 4 here.
-
-```{r plastic-waste-violin}
-# insert code here
+While Violin plots can display the full shape of the distribution more in depth, boxplots communicate the medians and quartliles more efficiently. 
+```{r}
+ggplot(plastic_waste, aes(x = continent, y = plastic_waste_per_cap, fill = continent)) +
+  geom_violin(alpha = 0.5) +
+  theme_minimal()
 ```
 
 ### Exercise 5
 
-Remove this text, and add your answer for Exercise 5 here.
+There is a strong positive relationship with the observation that as plastic waste per person grows, the plastic waste per person rises proportionately as well
 
 ```{r plastic-waste-mismanaged}
-# insert code here
+ggplot(plastic_waste, aes(x = plastic_waste_per_cap, 
+                          y = mismanaged_plastic_waste_per_cap)) +
+  geom_point()
 ```
 
 ### Exercise 6
-
-Remove this text, and add your answer for Exercise 6 here.
+Both Asian and African countries contained higher clusters of mismanaged waste, while North American and European countries tend to cluster lower, implying better waste management regardless of higher levels of consumption patterns.
 
 ```{r plastic-waste-mismanaged-continent}
-# insert code here
+ggplot(plastic_waste, aes(x = plastic_waste_per_cap, 
+                          y = mismanaged_plastic_waste_per_cap,
+                          color = continent)) +
+  geom_point()
 ```
 
 ### Exercise 7
 
-Remove this text, and add your answer for Exercise 7 here.
+There is no percieved consistent linear ratio to waste per capita, although the coastal population proportion is more consistent.
 
 ```{r plastic-waste-population-total}
-# insert code here
+# Total population
+ggplot(plastic_waste, aes(x = total_pop, y = plastic_waste_per_cap)) +
+  geom_point()
 ```
-
+# Coastal population
 ```{r plastic-waste-population-coastal}
-# insert code here
+ggplot(plastic_waste, aes(x = coastal_pop, y = plastic_waste_per_cap)) +
+  geom_point()
 ```
 
 ### Exercise 8
-
-Remove this text, and add your answer for Exercise 8 here.
+The plastic waste per capita is proportionate to the coastal population flux increase, as the smooth line reveals a positive trend with all continents. Additionally, the coastal exposure drives up higher consumption which can be attributed to a variety of factors.
 
 ```{r recreate-viz}
-# insert code here
+plastic_waste %>% 
+  mutate(coastal_pop_prop = coastal_pop / total_pop) %>%
+  filter(plastic_waste_per_cap < 3) %>%
+  ggplot(aes(x = coastal_pop_prop, y = plastic_waste_per_cap, color = continent)) + 
+    geom_point() +
+    geom_smooth(color = "black") +
+    scale_color_viridis_d() +
+    labs(x = "Coastal population proportion (Coastal / total population)", 
+         y = "Plastic waste per capita ", 
+         color = "Continent",
+         title = "Plastic waste vs. coastal population proportion",
+         subtitle = "by continent") +
+    theme_minimal()
 ```
